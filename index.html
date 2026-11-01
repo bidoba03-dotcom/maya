@@ -1,0 +1,214 @@
+<div id="offer-wall">
+  <div class="ow-header">
+    <div>
+      <h2>Available Offers</h2>
+      <p>Complete tasks & earn money</p>
+    </div>
+    <span class="live"><i></i> LIVE</span>
+  </div>
+
+  <div id="offerContainer">
+    <div class="loading">Loading offers...</div>
+  </div>
+</div>
+
+<style>
+#offer-wall {
+  font-family: Arial, sans-serif;
+  max-width: 650px;
+  margin: 15px auto;
+  padding: 12px;
+  background: #f5f7fb;
+  border-radius: 12px;
+  color: #172033;
+}
+
+.ow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 3px 14px;
+}
+
+.ow-header h2 {
+  font-size: 19px;
+  margin: 0 0 5px;
+}
+
+.ow-header p {
+  font-size: 12px;
+  color: #788397;
+  margin: 0;
+}
+
+.live {
+  font-size: 10px;
+  color: #159b65;
+  background: #dff8eb;
+  padding: 6px 9px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.live i {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #17bd79;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.offer-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px;
+  background: #fff;
+  border: 1px solid #e8ecf3;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.offer-number {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: #edf0ff;
+  color: #635bdf;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.offer-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.offer-info h3 {
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0 0 5px;
+  color: #273248;
+}
+
+.offer-reward {
+  color: #12a66a;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.offer-action {
+  text-decoration: none;
+  color: #fff;
+  background: #6258df;
+  padding: 8px 11px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.offer-action:hover {
+  background: #4940c4;
+}
+
+.loading {
+  text-align: center;
+  padding: 30px;
+  color: #788397;
+  font-size: 13px;
+}
+
+.error {
+  text-align: center;
+  padding: 20px;
+  color: #dc4545;
+  font-size: 13px;
+}
+
+@media(max-width:380px) {
+  .offer-item {
+    gap: 7px;
+    padding: 9px;
+  }
+
+  .offer-action {
+    padding: 7px 8px;
+    font-size: 10px;
+  }
+}
+</style>
+
+<script>
+(function() {
+  var container = document.getElementById("offerContainer");
+
+  window.offerWallCallback = function(offers) {
+    container.innerHTML = "";
+
+    if (!Array.isArray(offers) || !offers.length) {
+      container.innerHTML =
+        '<div class="error">No offers available.</div>';
+      return;
+    }
+
+    offers.slice(0, 10).forEach(function(offer, index) {
+      var item = document.createElement("div");
+      item.className = "offer-item";
+
+      var number = document.createElement("div");
+      number.className = "offer-number";
+      number.textContent = String(index + 1).padStart(2, "0");
+
+      var info = document.createElement("div");
+      info.className = "offer-info";
+
+      var title = document.createElement("h3");
+      title.textContent = offer.anchor || "Complete Offer";
+
+      var reward = document.createElement("div");
+      reward.className = "offer-reward";
+
+      var amount = Number(offer.conversion);
+      reward.textContent = Number.isFinite(amount)
+        ? "$" + amount.toFixed(2)
+        : offer.conversion || "Reward";
+
+      info.appendChild(title);
+      info.appendChild(reward);
+
+      var link = document.createElement("a");
+      link.className = "offer-action";
+      link.textContent = "START →";
+      link.href = offer.url || "#";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+
+      item.appendChild(number);
+      item.appendChild(info);
+      item.appendChild(link);
+
+      container.appendChild(item);
+    });
+  };
+
+  var script = document.createElement("script");
+  script.src =
+    "https://d3r33tlb373kwk.cloudfront.net/public/offers/feed.php" +
+    "?user_id=834484" +
+    "&api_key=c26f314be263d5346b49383bf11d177b" +
+    "&s1=&s2=&callback=offerWallCallback";
+
+  script.onerror = function() {
+    container.innerHTML =
+      '<div class="error">Unable to load offers.</div>';
+  };
+
+  document.body.appendChild(script);
+})();
+</script>
